@@ -6,9 +6,15 @@ use tauri::{AppHandle, Emitter, Manager};
 
 /// mp3 変換に使う ffmpeg(GPL)を、配布元から各自の環境へ直接取得するための URL。
 /// 同梱せずユーザー環境にダウンロードする運用にすることで、GPL バイナリの
-/// 再配布義務を負わない。macOS arm64 の静的ビルド。
-const FFMPEG_URL: &str =
-    "https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffmpeg-darwin-arm64";
+/// 再配布義務を負わない。universal ビルドでは実行中スライスのアーキに合わせて
+/// arm64 / x86_64 のどちらかを返す(`cfg!(target_arch)` はスライスごとに評価される)。
+fn ffmpeg_url() -> &'static str {
+    if cfg!(target_arch = "x86_64") {
+        "https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffmpeg-darwin-x64"
+    } else {
+        "https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/ffmpeg-darwin-arm64"
+    }
+}
 
 /// プレイリスト 1 件分の情報。
 #[derive(Serialize)]
@@ -134,14 +140,15 @@ fn ensure_ffmpeg_blocking(app: &AppHandle) -> Result<(), String> {
     let tmp = dir.join("ffmpeg.download");
     let _ = std::fs::remove_file(&tmp);
 
-    let total = remote_size(FFMPEG_URL).unwrap_or(0);
+    let url = ffmpeg_url();
+    let total = remote_size(url).unwrap_or(0);
     let _ = app.emit("ffmpeg-progress", 0.0_f64);
 
     // curl で配布元から直接ダウンロード(自前サーバーに再ホストしない = 再配布にならない)。
     let mut child = Command::new("/usr/bin/curl")
         .args(["-L", "--fail", "--silent", "--show-error", "-o"])
         .arg(&tmp)
-        .arg(FFMPEG_URL)
+        .arg(url)
         .stderr(Stdio::piped())
         .spawn()
         .map_err(|e| format!("ダウンロードを開始できません: {e}"))?;

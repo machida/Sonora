@@ -159,14 +159,22 @@ npm run tauri dev      # 開発実行（ホットリロード）
 
 ## ビルド
 
+Intel / Apple Silicon 両対応の **universal バイナリ**でビルドする（配布用）。
+
 ```sh
-npm run tauri build
+# 初回のみ：x86_64 ターゲットを追加
+rustup target add x86_64-apple-darwin
+
+npm run tauri build -- --target universal-apple-darwin
 ```
 
-成果物は `src-tauri/target/release/bundle/` に生成される。
+成果物は `src-tauri/target/universal-apple-darwin/release/bundle/` に生成される。
 
 - `bundle/macos/Sonora.app`
-- `bundle/dmg/Sonora_<version>_aarch64.dmg`
+- `bundle/dmg/Sonora_<version>_universal.dmg`
+
+> Apple Silicon 専用でよければ `npm run tauri build`（ターゲット指定なし）でも可。
+> その場合の成果物は `src-tauri/target/release/bundle/.../Sonora_<version>_aarch64.dmg`。
 
 > **注意**: 必ずプロジェクトルート（`Sonora/`）で実行すること。
 > 別ディレクトリで `npm run tauri build` すると `package.json` が見つからずエラーになる。
