@@ -1,9 +1,10 @@
 # Sonora
 
-YouTube の URL から音声をダウンロードする macOS 向けデスクトップアプリ。
-[Tauri 2](https://tauri.app/) 製。既定では **m4a（変換なし・高音質）** で保存するため
-`yt-dlp` だけで動作し、**ffmpeg は同梱していません**。mp3 が必要なときだけ、
-オプションを ON にした時点で ffmpeg を各自の環境へ自動ダウンロードします。
+**YouTube の URL から音声をダウンロードする macOS アプリ。**
+
+[Tauri 2](https://tauri.app/) 製。既定では **m4a（変換なし・高音質）** で保存するため `yt-dlp`
+だけで動作します。mp3 が必要なときだけ、オプションを ON にした時点で変換用の ffmpeg を
+各自の環境へ自動ダウンロードします（**ffmpeg は同梱していません**）。
 
 > [!IMPORTANT]
 > ### ⚠️ 免責事項・利用上の注意
@@ -22,54 +23,136 @@ YouTube の URL から音声をダウンロードする macOS 向けデスクト
 > otherwise permitted to download. Respect the terms of service of each platform and
 > all applicable copyright laws. The author assumes no liability for any use of this software.*
 
-## 機能
+## ダウンロード（コンパイル不要・これだけでOK）
 
-- YouTube の URL を入力して音声をダウンロード
-  - **既定は m4a**（YouTube 配信の音声をそのまま保存。変換なし＝高速・高音質・ffmpeg 不要）
-  - **「mp3 に変換する」トグル**を ON にすると mp3（最高音質）で保存。ON にした瞬間に
-    ffmpeg（約 45MB）の取得確認が出る。取得後は次回以降そのまま使える
-- 保存先フォルダを選択（既定はダウンロードフォルダ）
-- ダウンロード進捗バーとログ表示
-- **プレイリスト／ラジオの曲を個別に選択してダウンロード**
-  - URL に `&list=...` や `&start_radio=1` が含まれる場合、URL を入力すると
-    自動で曲一覧を取得して表示（`yt-dlp --flat-playlist`。実DLはしないので高速）
-  - 各曲は**既定でチェック済み**。ダウンロードしたくない曲のチェックを外す
-  - 「全選択 / 全解除」リンクで一括切り替え
-  - ダウンロードはチェックした曲だけ取得（`--yes-playlist --playlist-items 1,3,5…`）
-  - `list=` を含まない単体 URL は、そのまま 1 本だけ取得（`--no-playlist`）
+開発環境やターミナルは不要です。ビルド済みアプリをダウンロードするだけで使えます。
 
-## 入手・インストール
+**▶ [最新版をダウンロード（Releases）](https://github.com/machida/Sonora/releases/latest)**
 
-このアプリは**公証していない**ため、基本は **自分でビルドして使う**形です（→ [ビルド](#ビルド)）。
-できあがった `Sonora.app` を **`/Applications` にコピー**すれば、以降は Launchpad / Spotlight から起動できます。
-自分のMacでビルドしたものは隔離属性が付かないので、**警告なくそのまま起動**できます。
+- 直接ダウンロード：[**Sonora_1.0.0_universal.dmg**](https://github.com/machida/Sonora/releases/latest/download/Sonora_1.0.0_universal.dmg)
+- 対応環境：**macOS 11 以降（Intel / Apple Silicon 両対応）**
 
-### 配布版（.dmg）を受け取って使う場合
+### インストール手順
 
-他の人がビルドした `.dmg` を受け取った場合は、**ad-hoc 署名（公証なし）**のため初回に
-Gatekeeper の警告が出ます。次のどちらかで起動してください（初回のみ。以降は通常起動）。
+1. 上のリンクから **`.dmg`** をダウンロードして開く
+2. **`Sonora.app`** を「アプリケーション」フォルダにドラッグ
+3. **初回だけ**：`Sonora.app` を **右クリック →「開く」→ ダイアログで「開く」**
+   - このアプリは Apple の公証をしていないため、初回はそのままダブルクリックすると
+     「開けません」と表示されます。**右クリック →「開く」**なら起動できます（**2回目以降は普通にダブルクリックでOK**）。
+   - うまくいかない場合は、ターミナルで次を実行してから起動してください：
+     ```sh
+     xattr -dr com.apple.quarantine /Applications/Sonora.app
+     ```
 
-- `Sonora.app` を **右クリック →「開く」**
-- もしくはターミナルで隔離属性を外す：
-  ```sh
-  xattr -dr com.apple.quarantine /Applications/Sonora.app
-  ```
+> mp3 で保存したいときは、アプリ内で「mp3 に変換する」を ON にすると、初回だけ変換用の
+> ffmpeg（約 45MB）が自動でダウンロードされます。m4a（既定）はそのまま使えます。
+
+開発者向けに自分でビルドする方法は [開発・ビルド](#開発ビルド開発者向け) を参照してください。
 
 ## 使い方
 
 1. アプリを起動し、**YouTube の URL** を貼り付ける
 2. **保存先**フォルダを選ぶ（既定はダウンロードフォルダ）
 3. 形式を選ぶ
-   - そのまま＝**m4a**（変換なし・高音質・すぐ落とせる）
-   - **「mp3 に変換する」を ON**＝mp3（最高音質）。初回 ON のときだけ ffmpeg（約 45MB）の取得確認が出る（取得後は次回以降そのまま使える）
+   - 既定 = **m4a**（変換なし・高音質・すぐ落とせる・ffmpeg 不要）
+   - **「mp3 に変換する」を ON** = mp3（最高音質）。初回 ON のときだけ ffmpeg の取得確認が出る（取得後は次回以降そのまま使える）
 4. **「ダウンロード」**を押す。進捗バーとログで状況がわかる
 5. 完了後、「ダウンロード済み」の項目をクリックすると Finder で表示される
 
 ### プレイリスト／ラジオ
 
 URL に `&list=...` や `&start_radio=1` が含まれていると、自動で曲一覧が表示されます。
-落としたい曲だけチェックを残して（既定は全選択）「ダウンロード」。
-「全選択 / 全解除」で一括切り替えできます。
+
+- 各曲は**既定でチェック済み**。落としたくない曲のチェックを外す
+- 「全選択 / 全解除」で一括切り替え
+- チェックした曲だけダウンロードされる
+- `list=` を含まない単体 URL は、そのまま 1 本だけ取得
+
+---
+
+## 開発・ビルド（開発者向け）
+
+ここから下はソースから動かす人向けの情報です。
+
+### セットアップ
+
+```sh
+git clone https://github.com/machida/Sonora.git
+cd Sonora
+npm install
+
+# yt-dlp はリポジトリに含めていないので取得する（macOS 用・実行権限付与まで）
+mkdir -p src-tauri/bin
+curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos \
+  -o src-tauri/bin/yt-dlp
+chmod +x src-tauri/bin/yt-dlp
+```
+
+> ffmpeg は同梱しません。アプリ内で mp3 オプションを ON にしたときに自動取得されます。
+
+必要ツール：
+
+- Node.js / npm
+- Rust（cargo）
+- Tauri CLI（`devDependencies` に含まれる）
+- librsvg（`rsvg-convert`）… アイコン再生成で SVG を PNG に書き出す場合のみ（`brew install librsvg`）
+
+### 開発実行
+
+```sh
+npm run tauri dev      # ホットリロード付き
+```
+
+### ビルド
+
+Intel / Apple Silicon 両対応の **universal バイナリ**でビルドする（配布用）。
+
+```sh
+# 初回のみ：x86_64 ターゲットを追加
+rustup target add x86_64-apple-darwin
+
+npm run tauri build -- --target universal-apple-darwin
+```
+
+成果物は `src-tauri/target/universal-apple-darwin/release/bundle/` に生成される。
+
+- `bundle/macos/Sonora.app`
+- `bundle/dmg/Sonora_<version>_universal.dmg`
+
+> Apple Silicon 専用でよければ `npm run tauri build`（ターゲット指定なし）でも可。
+> その場合の成果物は `src-tauri/target/release/bundle/.../Sonora_<version>_aarch64.dmg`。
+
+> **注意**: 必ずプロジェクトルート（`Sonora/`）で実行すること。
+> 別ディレクトリで `npm run tauri build` すると `package.json` が見つからずエラーになる。
+
+#### 配布リリースを作る
+
+```sh
+git tag -a v1.0.0 -m "Sonora v1.0.0"
+git push origin v1.0.0
+gh release create v1.0.0 \
+  src-tauri/target/universal-apple-darwin/release/bundle/dmg/Sonora_1.0.0_universal.dmg \
+  --title "Sonora v1.0.0" --notes "（リリースノート）"
+```
+
+> リリースノートには、上記の **免責事項・利用上の注意**も併記しておくとよい。
+
+### 署名について
+
+ad-hoc 署名（公証なし）。自分の Mac では問題なく起動するが、他人の Mac に配布すると初回に
+Gatekeeper の警告が出る（→ 右クリック →「開く」で回避）。警告なしの配布には Apple
+Developer ID による署名＋公証が必要。
+
+### DMG ビルドが失敗する場合
+
+`bundle_dmg.sh` でエラーになるときは、前回の中断で一時 DMG がマウントされたまま残っている
+ことが多い。以下で解除・削除してから再ビルドする。
+
+```sh
+hdiutil info | grep Sonora                 # マウント中の image-path を確認
+hdiutil detach /dev/diskN -force           # 該当ディスクを解除
+rm -f src-tauri/target/**/bundle/macos/rw.*.dmg
+```
 
 ## 構成
 
@@ -134,73 +217,6 @@ npx tauri icon app-icon.svg
 
 > Dock やウィンドウのアイコンはビルド時に埋め込まれるため、再生成後は
 > `npm run tauri build`（または dev 再起動）で反映される。
-
-## セットアップ（開発・ビルド共通）
-
-```sh
-git clone https://github.com/machida/Sonora.git
-cd Sonora
-npm install
-
-# yt-dlp はリポジトリに含めていないので取得する（macOS 用・実行権限付与まで）
-mkdir -p src-tauri/bin
-curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos \
-  -o src-tauri/bin/yt-dlp
-chmod +x src-tauri/bin/yt-dlp
-```
-
-> ffmpeg は同梱しません。アプリ内で mp3 オプションを ON にしたときに自動取得されます。
-
-## 開発
-
-```sh
-npm run tauri dev      # 開発実行（ホットリロード）
-```
-
-## ビルド
-
-Intel / Apple Silicon 両対応の **universal バイナリ**でビルドする（配布用）。
-
-```sh
-# 初回のみ：x86_64 ターゲットを追加
-rustup target add x86_64-apple-darwin
-
-npm run tauri build -- --target universal-apple-darwin
-```
-
-成果物は `src-tauri/target/universal-apple-darwin/release/bundle/` に生成される。
-
-- `bundle/macos/Sonora.app`
-- `bundle/dmg/Sonora_<version>_universal.dmg`
-
-> Apple Silicon 専用でよければ `npm run tauri build`（ターゲット指定なし）でも可。
-> その場合の成果物は `src-tauri/target/release/bundle/.../Sonora_<version>_aarch64.dmg`。
-
-> **注意**: 必ずプロジェクトルート（`Sonora/`）で実行すること。
-> 別ディレクトリで `npm run tauri build` すると `package.json` が見つからずエラーになる。
-
-### 署名について
-
-ad-hoc 署名（公証なし）。自分の Mac では問題なく起動するが、他人の Mac に配布すると
-Gatekeeper の警告が出る。正式配布には Apple Developer ID による署名＋公証が必要。
-
-### DMG ビルドが失敗する場合
-
-`bundle_dmg.sh` でエラーになるときは、前回の中断で一時 DMG がマウントされたまま残っている
-ことが多い。以下で解除・削除してから再ビルドする。
-
-```sh
-hdiutil info | grep Sonora                 # マウント中の image-path を確認
-hdiutil detach /dev/diskN -force           # 該当ディスクを解除
-rm -f src-tauri/target/release/bundle/macos/rw.*.dmg
-```
-
-## 必要ツール
-
-- Node.js / npm
-- Rust（cargo）
-- Tauri CLI（`devDependencies` に含まれる）
-- librsvg（`rsvg-convert`）… アイコン再生成で SVG を PNG に書き出す場合のみ（`brew install librsvg`）
 
 ## ライセンス / License
 
