@@ -1,0 +1,29 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8b5cf6" />
+      <stop offset="1" stop-color="#6d28d9" />
+    </linearGradient>
+    <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.16" />
+      <stop offset="0.5" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- macOS 慣習: squircle の周囲に透明余白を持たせて Dock で他アイコンと揃える -->
+  <g transform="translate(512 512) scale(0.8) translate(-512 -512)">
+    <rect x="0" y="0" width="1024" height="1024" rx="230" fill="url(#bg)" />
+    <rect x="0" y="0" width="1024" height="1024" rx="230" fill="url(#gloss)" />
+
+    <g transform="translate(512 512) scale(0.8) translate(-512 -512)">
+      <g fill="#ffffff" stroke="#ffffff" stroke-width="22" stroke-linejoin="round">
+        <path d="M257 340 L257 684 L497 512 Z" />
+      </g>
+      <g fill="#ffffff">
+        <rect x="527" y="432" width="60" height="160" rx="30" />
+        <rect x="617" y="362" width="60" height="300" rx="30" />
+        <rect x="707" y="407" width="60" height="210" rx="30" />
+      </g>
+    </g>
+  </g>
+</svg>

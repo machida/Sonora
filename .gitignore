@@ -1,0 +1,21 @@
+# 依存
+/node_modules
+
+# ビルド成果物
+/dist
+/src-tauri/target
+
+# Tauri の生成物（ビルド時に再生成される）
+/src-tauri/gen/schemas
+
+# 同梱バイナリ（リポジトリには含めない。取得手順は README 参照）
+/src-tauri/bin
+
+# アイコンの作業用バックアップ
+/app-icon-fullbleed.bak.png
+
+# macOS
+.DS_Store
+
+# ログ等
+*.log
